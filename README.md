@@ -147,6 +147,11 @@ Open:
 ```text
 http://127.0.0.1:5000
 ```
+### MLflow Experiment Tracking
+
+The training pipeline logs Logistic Regression, Random Forest, and XGBoost runs to MLflow for experiment tracking and model performance comparison.
+
+![MLflow Experiment Tracking](screenshots/mlflow-experiments.png)
 
 ## 6. Start API
 

@@ -100,7 +100,7 @@ def main():
 
             mlflow.log_param("model_name", model_name)
             mlflow.log_metrics(metrics)
-            mlflow.sklearn.log_model(pipeline, artifact_path="model")
+            # mlflow.sklearn.log_model(pipeline, artifact_path="model")
 
             leaderboard.append({"model": model_name, **metrics})
 
