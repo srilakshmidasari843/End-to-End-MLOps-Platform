@@ -185,6 +185,12 @@ Example response:
   "probability": 0.72
 }
 ```
+## API Demo
+
+The FastAPI service exposes an interactive Swagger UI for testing the customer churn prediction endpoint.
+
+![FastAPI Swagger Demo](docs/swagger-api.png)
+
 
 ## 7. Run tests
 
