@@ -80,6 +80,7 @@ def main():
     best_name = None
     best_score = float("-inf")
     best_pipeline = None
+    best_run_id = None
     leaderboard = []
 
     for model_name, model in get_models(random_state).items():
@@ -90,7 +91,7 @@ def main():
             ]
         )
 
-        with mlflow.start_run(run_name=model_name):
+        with mlflow.start_run(run_name=model_name) as run:
             pipeline.fit(X_train, y_train)
 
             predictions = pipeline.predict(X_test)
@@ -108,10 +109,16 @@ def main():
                 best_score = metrics["roc_auc"]
                 best_name = model_name
                 best_pipeline = pipeline
+                best_run_id = run.info.run_id
 
     artifact_path = Path(config["artifacts"]["model_path"])
     artifact_path.parent.mkdir(parents=True, exist_ok=True)
     joblib.dump(best_pipeline, artifact_path)
+    mlflow.log_artifact(
+    str(artifact_path),
+    artifact_path="best_model",
+    run_id=best_run_id,
+)
 
     leaderboard_df = pd.DataFrame(leaderboard).sort_values(
         "roc_auc", ascending=False
