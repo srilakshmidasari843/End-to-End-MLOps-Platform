@@ -33,3 +33,19 @@ class ChurnPredictor:
             "label": "churn" if prediction == 1 else "no_churn",
             "probability": round(probability, 4),
         }
+
+if __name__ == "__main__":
+    predictor = ChurnPredictor()
+
+    sample = {
+        "tenure": 12,
+        "monthly_charges": 70.5,
+        "total_charges": 850.0,
+        "contract_type": "Month-to-month",
+        "payment_method": "Electronic check",
+        "internet_service": "Fiber optic",
+        "paperless_billing": "Yes",
+        "support_calls": 3,
+    }
+
+    print(predictor.predict(sample))
