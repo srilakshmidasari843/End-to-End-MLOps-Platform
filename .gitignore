@@ -6,6 +6,6 @@ __pycache__/
 .ipynb_checkpoints/
 mlruns/
 mlartifacts/
-artifacts/*.joblib
+#artifacts/*.joblib
 .pytest_cache/
 .DS_Store
