@@ -1,242 +1,261 @@
-# End-to-End MLOps Platform
+# End-to-End Customer Churn MLOps Platform
 
-A production-style machine learning project for customer churn prediction.
+An end-to-end machine learning platform for training, tracking, testing, and serving a customer churn prediction model.
 
-## What this project demonstrates
+This project demonstrates how a machine learning model can move from experimentation into a reproducible inference service with experiment tracking, automated testing, containerization, and continuous integration.
 
-- Data ingestion and validation
-- Feature preprocessing with scikit-learn pipelines
-- Logistic Regression, Random Forest, and XGBoost training
+# Project Overview
+
+The system trains machine learning models to predict customer churn using customer account and service information.
+
+The project includes:
+
+- Data preprocessing and feature engineering
+- Logistic Regression and Random Forest model training
 - MLflow experiment tracking
-- Model evaluation and artifact logging
-- FastAPI inference API
+- Model artifact persistence
+- FastAPI inference service
+- Request validation with Pydantic
+- Automated API testing with pytest
 - Docker containerization
-- Automated tests with pytest
 - GitHub Actions CI
-- Configuration-driven training
-- Clean production-style project structure
+- Automated Docker build validation
 
-## Architecture
+# Architecture
 
-```text
-Raw CSV
-   |
-   v
-Data Validation
-   |
-   v
-Train/Test Split
-   |
-   v
-Preprocessing Pipeline
-   |
-   v
+Customer Churn Dataset
+        |
+        v
+Data Processing
+        |
+        v
+Feature Engineering
+        |
+        v
 Model Training
-   |
-   +------> MLflow Experiments
-   |
-   v
+        |
+        v
+MLflow Experiment Tracking
+        |
+        v
 Best Model Artifact
-   |
-   v
+        |
+        v
 FastAPI Prediction Service
-   |
-   v
-Docker / CI
-```
+        |
+        v
+Docker Container
+        |
+        v
+GitHub Actions CI
 
-## Project Structure
+# Technology Stack
 
-```text
+Language: Python
+
+Machine Learning: scikit-learn
+
+Data Processing: pandas
+
+Experiment Tracking: MLflow
+
+API: FastAPI
+
+Validation: Pydantic
+
+Testing: pytest
+
+Model Serialization: joblib
+
+Containerization: Docker
+
+Continuous Integration: GitHub Actions
+
+# Project Structure
+
 end-to-end-mlops-platform/
-├── api/
-│   └── main.py
-├── configs/
-│   └── config.yaml
-├── data/
-│   ├── raw/
-│   └── processed/
-├── notebooks/
-├── src/
-│   ├── data/
-│   │   ├── ingest.py
-│   │   └── validate.py
-│   ├── features/
-│   │   └── build_features.py
-│   ├── models/
-│   │   ├── train.py
-│   │   └── predict.py
-│   └── utils/
-│       └── config.py
-├── tests/
-│   ├── test_data.py
-│   └── test_api.py
-├── .github/workflows/ci.yml
-├── Dockerfile
-├── docker-compose.yml
-├── requirements.txt
-└── README.md
-```
 
-## 1. Create environment
+api/
+    main.py
 
-```bash
-python -m venv venv
-```
+configs/
+    config.yaml
 
-Windows:
+data/
+    raw/
 
-```bash
-venv\Scripts\activate
-```
+src/
+    features/
+    models/
+        train.py
+        predict.py
+    utils/
 
-Mac/Linux:
+tests/
+    test_api.py
 
-```bash
-source venv/bin/activate
-```
+artifacts/
+    best_model.joblib
 
-## 2. Install dependencies
+.github/
+    workflows/
+        ci.yml
 
-```bash
-pip install -r requirements.txt
-```
+Dockerfile
 
-## 3. Generate sample data
+.dockerignore
 
-The repository contains a script that generates a synthetic churn dataset.
+requirements.txt
 
-```bash
-python scripts/generate_sample_data.py
-```
+README.md
 
-This creates:
+# Model Training
 
-```text
-data/raw/customer_churn.csv
-```
+The training pipeline reads configuration values from configs/config.yaml and prepares the customer churn dataset for model development.
 
-## 4. Train models
-
-```bash
-python -m src.models.train
-```
-
-The training pipeline compares:
+The project evaluates multiple classification approaches including:
 
 - Logistic Regression
 - Random Forest
-- XGBoost
 
-The best model is saved to:
+The trained model artifact is stored so the inference API can load the model independently from the training process.
 
-```text
-artifacts/best_model.joblib
-```
+# MLflow Experiment Tracking
 
-## 5. Start MLflow
+MLflow is used to track machine learning experiments and compare training runs.
 
-In another terminal:
+To start MLflow:
 
-```bash
 mlflow ui
-```
 
-Open:
+Open in the browser:
 
-```text
 http://127.0.0.1:5000
-```
-### MLflow Experiment Tracking
 
-The training pipeline logs Logistic Regression, Random Forest, and XGBoost runs to MLflow for experiment tracking and model performance comparison.
+The MLflow interface allows model experiments and different training runs to be inspected and compared.
 
-![MLflow Experiment Tracking](screenshots/mlflow-experiments.png)
+# Prediction API
 
-## 6. Start API
+The trained machine learning model is exposed through a FastAPI application.
 
-```bash
-uvicorn api.main:app --reload
-```
+Available endpoints:
 
-Open Swagger:
+GET /
 
-```text
-http://127.0.0.1:8000/docs
-```
+Returns basic information about the API.
 
-## API example
+GET /health
 
-POST `/predict`
+Checks whether the API is healthy and whether the model artifact is available.
 
-```json
+POST /predict
+
+Accepts customer information and generates a churn prediction.
+
+Example prediction request:
+
 {
   "tenure": 12,
-  "monthly_charges": 79.5,
-  "total_charges": 950.0,
+  "monthly_charges": 70.0,
+  "total_charges": 840.0,
   "contract_type": "Month-to-month",
   "payment_method": "Electronic check",
   "internet_service": "Fiber optic",
-  "support_calls": 3
+  "support_calls": 2
 }
-```
 
-Example response:
+The endpoint returns the churn prediction and prediction probability.
 
-```json
-{
-  "prediction": 1,
-  "label": "churn",
-  "probability": 0.72
-}
-```
-## API Demo
+# Running the API Locally
 
-The FastAPI service exposes an interactive Swagger UI for testing the customer churn prediction endpoint.
+Install dependencies:
 
-![FastAPI Swagger Demo](docs/swagger-api.png)
+pip install -r requirements.txt
 
+Start the FastAPI application:
 
-## 7. Run tests
+uvicorn api.main:app --reload
 
-```bash
-pytest -q
-```
+Open the API documentation:
 
-## 8. Docker
+http://127.0.0.1:8000/docs
 
-Build:
+FastAPI provides an interactive Swagger interface for testing the endpoints.
 
-```bash
-docker build -t churn-ml-api .
-```
+# Automated Testing
 
-Run:
+The API is tested using pytest and FastAPI's test client.
 
-```bash
-docker run -p 8000:8000 churn-ml-api
-```
+Run the tests with:
 
-## 9. GitHub
+python -m pytest -q
 
-```bash
-git init
-git add .
-git commit -m "Build end-to-end MLOps churn prediction platform"
-git branch -M main
-git remote add origin YOUR_GITHUB_REPOSITORY_URL
-git push -u origin main
-```
+The tests verify:
 
-## Suggested improvements
+- Health endpoint availability
+- Successful prediction requests
+- Expected HTTP status codes
+- Prediction response structure
 
-After the base version works, extend it with:
+# Docker
 
-- MLflow Model Registry
-- Airflow retraining DAG
-- Evidently drift detection
-- Prometheus/Grafana monitoring
-- Kubernetes manifests
-- AWS deployment
-- Data versioning with DVC
-- Feature store integration
+The prediction API is containerized using Docker.
+
+Build the Docker image:
+
+docker build -t churn-mlops-api .
+
+Run the container:
+
+docker run -p 8000:8000 churn-mlops-api
+
+Open:
+
+http://localhost:8000/docs
+
+The application and its dependencies can therefore run inside a reproducible container environment.
+
+# Continuous Integration
+
+GitHub Actions is used for continuous integration.
+
+The CI workflow automatically:
+
+1. Sets up Python
+2. Installs project dependencies
+3. Runs the pytest test suite
+4. Builds the Docker image
+
+This helps ensure that new changes do not break the application, tests, or Docker build.
+
+# Key Engineering Features
+
+- End-to-end machine learning pipeline
+- Configuration-driven model training
+- MLflow experiment tracking
+- Persisted model artifacts
+- Reusable prediction logic
+- REST API using FastAPI
+- Pydantic request validation
+- Automated pytest testing
+- Docker containerization
+- GitHub Actions continuous integration
+- Automated Docker build validation
+
+# Future Improvements
+
+Potential future improvements include:
+
+- Cloud deployment
+- Model registry
+- Automated model retraining
+- Data drift monitoring
+- Prediction drift monitoring
+- Production observability
+- Managed model artifact storage
+
+# Author
+
+Srilakshmi Dasari
+
+End-to-end MLOps engineering project demonstrating model development, experiment tracking, API serving, automated testing, Docker containerization, and continuous integration.
